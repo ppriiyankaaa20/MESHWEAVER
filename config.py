@@ -1,0 +1,26 @@
+PROJECT_NAME = "MeshWeaver"
+VERSION = "0.1.0"
+
+HOST = "127.0.0.1"
+DEFAULT_PORT = 8000
+
+DEFAULT_PEER_HOST = "127.0.0.1"
+DEFAULT_PEER_PORT = 8001
+
+PROTOCOL = "UDP"
+BUFFER_SIZE = 65535
+NETWORK_TIMEOUT = 5.0
+
+PING = "PING"
+PONG = "PONG"
+TASK = "TASK"
+RESULT = "RESULT"
+ERROR = "ERROR"
+
+SERIALIZER = "cloudpickle"
+
+LOG_LEVEL = "INFO"
+
+
+def get_node_address(host=HOST, port=DEFAULT_PORT):
+    return f"{host}:{port}"
