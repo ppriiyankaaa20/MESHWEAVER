@@ -1,4 +1,5 @@
 import asyncio
+import cloudpickle
 
 
 class UDPServerProtocol(asyncio.DatagramProtocol):
@@ -7,17 +8,53 @@ class UDPServerProtocol(asyncio.DatagramProtocol):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        message = data.decode()
 
-        print(f"Received from {addr}: {message}")
+        # -------------------------
+        # PING message
+        # -------------------------
+        if data == b"PING":
 
-        if message == "PING":
-            response = "PONG"
+            print(f"Received from {addr}: PING")
 
-            self.transport.sendto(
-                response.encode(),
-                addr
-            )
+            response = b"PONG"
+
+            self.transport.sendto(response, addr)
+
+            print("Sent: PONG")
+
+        # -------------------------
+        # TASK message
+        # -------------------------
+        else:
+
+            print(f"Received task from {addr}")
+
+            try:
+
+                # Deserialize function + arguments
+                task = cloudpickle.loads(data)
+
+                function = task["function"]
+                arguments = task["arguments"]
+
+                print("Task received!")
+                print("Executing task...")
+
+                # Execute function
+                result = function(*arguments)
+
+                print("Task result:", result)
+
+                # Send result back
+                result_data = cloudpickle.dumps(result)
+
+                self.transport.sendto(result_data, addr)
+
+                print("Result sent to client.")
+
+            except Exception as e:
+
+                print("Task execution failed:", e)
 
 
 async def main():
@@ -29,8 +66,10 @@ async def main():
         local_addr=("127.0.0.1", 8000)
     )
 
+    print("===================================")
     print("MeshWeaver Node B started...")
     print("Listening on 127.0.0.1:8000")
+    print("===================================")
 
     try:
         await asyncio.Future()
