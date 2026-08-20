@@ -1,26 +1,79 @@
 import asyncio
+import cloudpickle
+
+
+def add(a, b):
+    return a + b
 
 
 class UDPClientProtocol(asyncio.DatagramProtocol):
 
     def connection_made(self, transport):
+
         self.transport = transport
 
-        message = "PING"
+        print("MeshWeaver Node A started.")
 
-        print("Sending:", message)
+        # Step 1: Send PING
+        print("\nSending: PING")
 
         self.transport.sendto(
-            message.encode(),
+            b"PING",
             ("127.0.0.1", 8000)
         )
 
     def datagram_received(self, data, addr):
-        message = data.decode()
 
-        print("Received:", message)
+        # -------------------------
+        # PONG received
+        # -------------------------
+        if data == b"PONG":
 
-        self.transport.close()
+            print("Received: PONG")
+
+            # Now send task
+            self.send_task()
+
+        # -------------------------
+        # Task result received
+        # -------------------------
+        else:
+
+            try:
+
+                result = cloudpickle.loads(data)
+
+                print("\nReceived task result:", result)
+
+                print("\nTask completed successfully!")
+
+                self.transport.close()
+
+            except Exception as e:
+
+                print("Could not read result:", e)
+
+    def send_task(self):
+
+        print("\nPreparing task...")
+
+        # Function + arguments
+        task = {
+            "function": add,
+            "arguments": (10, 20)
+        }
+
+        # Serialize task
+        task_data = cloudpickle.dumps(task)
+
+        print("Sending task: add(10, 20)")
+        print("Serialized task size:", len(task_data), "bytes")
+
+        # Send to server
+        self.transport.sendto(
+            task_data,
+            ("127.0.0.1", 8000)
+        )
 
 
 async def main():
@@ -32,9 +85,13 @@ async def main():
         local_addr=("127.0.0.1", 0)
     )
 
-    await asyncio.sleep(2)
+    try:
 
-    transport.close()
+        await asyncio.Future()
+
+    finally:
+
+        transport.close()
 
 
 asyncio.run(main())
