@@ -7,11 +7,13 @@ class UDPServerProtocol(asyncio.DatagramProtocol):
         self.transport = transport
 
     def datagram_received(self, data, addr):
+
         message = data.decode()
 
         print(f"Received from {addr}: {message}")
 
         if message == "PING":
+
             response = "PONG"
 
             self.transport.sendto(
