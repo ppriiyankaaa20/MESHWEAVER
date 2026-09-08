@@ -1,1 +1,4 @@
-pip install cloudpickle
+cloudpickle
+cryptography
+rich
+psutil
