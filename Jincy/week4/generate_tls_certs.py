@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.serialization import Encoding
 
 CERT_DIR = Path("certs")
 CERT_DIR.mkdir(exist_ok=True)
+NODE_PORTS = range(8001, 8011)
 
 
 # ==========================================
@@ -88,7 +89,7 @@ ca_cert = (
 # Create Node Certificates
 # ==========================================
 
-for port in [8001, 8002, 8003]:
+for port in NODE_PORTS:
 
     node_key = rsa.generate_private_key(
         public_exponent=65537,

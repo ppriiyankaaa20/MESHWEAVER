@@ -5,7 +5,7 @@ from security import (
 )
 
 
-for port in [8001, 8002, 8003]:
+for port in range(8001, 8011):
 
     private_key, public_key = generate_key_pair()
 
